@@ -26,8 +26,8 @@ module registers(
     input logic [4:0] rs2,
     input logic [4:0] rd,
     input logic [31:0] write_data,
-    output [31:0] read_data_one,
-    output [31:0] read_data_two
+    output logic [31:0] read_data_one,
+    output logic [31:0] read_data_two
 );
 
 endmodule

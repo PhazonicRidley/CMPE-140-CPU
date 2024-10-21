@@ -19,14 +19,14 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+// ALUSrc -> is_operand_imm
 module decode(
     input clk,
     input [31:0] instruction,
-    input [4:0] rs1, rs2, rd,
+    output logic [4:0] rs1, rs2, rd,
     output logic [31:0] reg_data_one, reg_data_two,
     output logic signed [31:0] signed_imm,
-    output logic branch, mem_read, mem_to_reg, mem_write, alu_src, reg_write, clk_out,
-    output logic [15:0] alu_op
+    output logic [15:0] alu_op,
+    output logic branch, mem_read, mem_to_reg, mem_write, is_operand_imm, reg_write, clk_out
     );
 endmodule

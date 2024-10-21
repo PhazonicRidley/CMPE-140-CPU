@@ -21,10 +21,9 @@
 
 
 module fetch(
-    input clk,
     input [31:0] pc, imem_insn,
     output logic [31:0] new_pc, imem_addr,
-    output logic [31:0] instruction,
-    output logic out_clk
-    );
+    output logic [31:0] instruction    
+);
+
 endmodule

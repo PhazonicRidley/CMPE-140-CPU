@@ -23,7 +23,9 @@
 module mem_access(
     input clk, 
     input logic mem_read, mem_write,
-    input logic [31:0] alu_result,
+    input logic [31:0] addr, write_data,
+    inout [31:0] dmem_data,
+    output logic [31:0] read_data,
     output logic [31:0] dmem_addr,
     output logic dmem_wen,
     output logic clk_out
@@ -31,12 +33,19 @@ module mem_access(
 always @ (posedge clk) begin
     if (mem_read && !mem_write) begin
         // Address dmem_addr and get data
-        dmem_addr = alu_result;
-        dmem_wen = 0;
+        dmem_addr <= addr;
+        dmem_wen <= 0;
+        read_data <= dmem_data;
     end
     else if (!mem_read && mem_write) begin
-        dmem_addr = alu_result;
-        dmem_wen = 1;
+        dmem_addr <= addr;
+        dmem_wen <= 1;
+        dmem_data <= write_data;
+        read_data <= 0;
     end
+end
+
+always @ (clk) begin
+    clk_out <= clk;
 end
 endmodule
