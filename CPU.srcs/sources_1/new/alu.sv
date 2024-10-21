@@ -22,10 +22,21 @@
 // TODO: Branch flags, ALU is responsible for comparison!
 module alu(
     input clk,
-    input logic [31:0] data_one, data_two,
-    input logic [15:0] alu_op,
+    input logic [31:0] data_one, data_two, signed_imm,
+    input logic [3:0] alu_op,
     output logic [31:0] result,
     output logic clk_out
 );
+    reg [31:0] data_two_reg;
+    assign data_two_reg = data_two + signed_imm;
 
+always @(posedge clk) begin
+    if(alu_op == 4'b0) begin
+        result <= data_one + data_two_reg;
+    end
+end
+
+always @(posedge clk or negedge clk) begin
+    clk_out <= clk;
+end
 endmodule

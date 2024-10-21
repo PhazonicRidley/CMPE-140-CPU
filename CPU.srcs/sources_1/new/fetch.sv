@@ -27,4 +27,13 @@ module fetch(
     output logic [31:0] instruction,
     output logic out_clk
     );
+        
+    always @(posedge clk) begin
+        imem_addr <= pc;
+        instruction <= imem_insn;
+        new_pc <= pc + 4;
+    end 
+    always @(posedge clk or negedge clk) begin
+        out_clk <= clk;
+    end   
 endmodule
