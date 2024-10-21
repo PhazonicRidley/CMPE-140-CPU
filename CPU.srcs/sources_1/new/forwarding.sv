@@ -24,6 +24,6 @@ module forwarding(
     input logic [4:0] idex_rs1, idex_rs2,
     input logic [4:0] exmem_rd,
     input logic [4:0] memwb_rd,
-    output logic fwda, fwdb 
+    output logic fwda, fwdb //forwarding outs
 );
 endmodule

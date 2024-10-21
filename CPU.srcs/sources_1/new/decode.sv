@@ -52,9 +52,8 @@ module decode(
             reg_write <= 1'b0;
             //add
             if(func3 == 3'b000) begin
-                alu_op <= 4'b0000;
+                alu_op <= 4'b0000; //for addition
             end
-            //why do some I-inst have func7?
             else begin
                 alu_op <= 4'b1101;
             end

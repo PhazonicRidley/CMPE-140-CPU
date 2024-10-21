@@ -32,7 +32,7 @@ module alu(
 
 always @(posedge clk) begin
     if(alu_op == 4'b0) begin
-        result <= data_one + data_two_reg;
+        result <= data_one + data_two_reg; //alu result (for addi only for now)
     end
 end
 

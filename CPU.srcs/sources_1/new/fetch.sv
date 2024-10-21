@@ -29,9 +29,9 @@ module fetch(
     );
         
     always @(posedge clk) begin
-        imem_addr <= pc;
+        imem_addr <= pc; //set address to pc
         instruction <= imem_insn;
-        new_pc <= pc + 4;
+        new_pc <= pc + 4; //increment pc 4
     end 
     always @(posedge clk or negedge clk) begin
         out_clk <= clk;
