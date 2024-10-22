@@ -19,15 +19,29 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-// TODO: Param this module
 module registers(
+    input logic clk,
     input logic write_en,
     input logic [4:0] rs1,
     input logic [4:0] rs2,
     input logic [4:0] rd,
     input logic [31:0] write_data,
-    output [31:0] read_data_one,
-    output [31:0] read_data_two
+    output logic [31:0] read_data_one,
+    output logic [31:0] read_data_two
 );
+
+    logic [31:0] registers[32];
+    always_ff @ (posedge clk) begin
+        if (write_en && rd != 0) registers[rd] <= write_data;
+    end
+    
+    always_comb begin
+        read_data_one = registers[rs1];
+        read_data_two = registers[rs2];
+       /* if (write_en && rd != 0) begin
+            if (rs1 == rd) read_data_one = write_data;
+            if (rs2 == rd) read_data_two = write
+        end */
+    end
 
 endmodule

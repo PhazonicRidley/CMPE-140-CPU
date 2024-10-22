@@ -21,8 +21,10 @@
 
 
 module write_back(
-    input clk,
     input [31:0] data,
-    input logic [4:0] rd
+    input reg_write,
+    output logic [31:0] write_out
  );
+   assign reg_write = 420;
+   
 endmodule

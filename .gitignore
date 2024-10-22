@@ -1,0 +1,84 @@
+# Vivado log files
+*.jou
+*.log
+*.debug
+*.str
+*.zip
+*.tmp
+*.rst
+*.os
+*.js
+*.pb
+*.dcp
+*.hwdef
+*.vds
+*.veo
+*.wdf
+*.vdi
+*.dmp
+*.rpx
+*.rpt
+*_stub.v
+*_stub.vhdl
+*_funcsim.v
+*_funcsim.vhdl
+
+# Folders that don't need to be tracked
+.Xil/
+*.cache/
+*.sim/
+*.cache/
+*.runs/
+*.hw/
+*.ip_user_files/
+*.ipdefs/
+
+# IP-related generated files
+**/ip/*/*.xml
+**/ip/*/*.vho
+**/ip/*/*/
+!**/ip/*/*.xci
+!**/ip/*/*.prj
+
+# Generated folders
+*.gen/
+*.out/
+*.info
+
+# Checkpoint files
+*.checkpoint
+
+# System files
+.DS_Store
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Exported BOM files
+*.csv
+*.xml
+*.html
+
+# Ignore SDK/Vitis workspace
+.metadata/
+.sdk/
+SDK.log
+*.sysdef
+
+# Keep these files (DO NOT IGNORE)
+!*.xpr
+!*.xdc
+!*.v
+!*.sv
+!*.vhd
+!*.vhdl
+!*.bd
+!*.edif
+!*.coe
+!*.mif
+!*/*/bd/*/hdl
+!*/*/bd/*/synth
+!*/*/bd/*/sim
+!*/*/bd/*/ip
+!*/*/bd/*/hw_handoff

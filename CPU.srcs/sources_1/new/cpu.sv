@@ -27,7 +27,7 @@ module cpu(
     output logic [31:0] dmem_addr,
     inout logic [31:0] dmem_data,
     output logic dmem_wen // 1 = W, 0 = R
- );
+);
  
 always @ (negedge rst_n) begin
     imem_addr = 0;
@@ -35,58 +35,148 @@ always @ (negedge rst_n) begin
     dmem_wen = 0;
 end
 
-// TODO: pipeline registers
-// Clocks and other state will be "handed back" by each submodule
+// Program Counter Register
+// TODO: Propagate PC state to MEM stage for jumping.
 logic [31:0] pc = 0;
 
-// Register file
-logic [4:0] rs1, rs2, rd;
-logic [31:0] reg_read_data_one, reg_read_data_two, reg_write_data;
-logic reg_write_en;
-registers rf(write_en, rs1, rs2, rd, reg_write_data, reg_read_data_one, reg_read_data_two);
+// ********************************
+// *            Fetch             *
+// ********************************
 
-// fetch internal state
-logic f_out_clk;
-logic [31:1] instruction;
-fetch f(clk, pc, imem_insn, pc, imem_addr, instruction, f_out_clk);
+logic [31:0] f_instruction;
+fetch f(pc, imem_insn, pc, imem_addr, f_instruction);
 
-// Decode internal state
-logic d_out_clk, TEMP_reg_write; // reg_write will be managed by the pipeline MEM/WB reg
+logic [31:0] if_id_instruction;
+always @ (posedge clk) begin
+    // TODO: reset and write enable
+    if_id_instruction <= f_instruction;
+end
+
+// ********************************
+// *            Decode            *
+// ********************************
+logic [4:0] d_rs1, d_rs2, d_rd;
+
 // TODO: Why does it say to extend imm up to 64 bits for a 32 bit CPU?
-logic [31:0] signed_imm;
-
-// control signals
+logic [31:0] d_signed_imm, d_reg_read_data_one, d_reg_read_data_two;
+logic d_branch, d_mem_read, d_mem_write, 
+    d_mem_to_reg, d_is_operand_imm, d_reg_write;
+logic [3:0] d_alu_op;
 // Ensure that mem_read and/or mem_write are ONLY set when theres a valid memory address.
-logic branch, mem_read, is_data_mem, mem_write, is_operand_imm, to_write_back;
-logic [15:0] alu_op;
-decode d(f_out_clk, instruction, rs1, rs2, rd, 
-         reg_read_data_one, reg_read_data_two, 
-         signed_imm, branch, mem_read, is_data_mem, 
-         mem_write, is_operand_imm, TEMP_reg_write, d_clk_out, alu_op);
+decode d(if_id_instruction, d_rs1, d_rs2, d_rd, 
+         d_signed_imm, d_alu_op,
+         d_branch, d_mem_read, d_mem_to_reg, d_mem_write, 
+         d_is_operand_imm, d_reg_write);
 
-// Execute (ALU) internal state
+logic id_ex_branch, id_ex_mem_read, id_ex_mem_to_reg;
+// ALUSrc -> is_operand_imm
+logic id_ex_mem_write, id_ex_is_operand_imm;
+logic id_ex_reg_write;
 
-logic x_clk_out;
-logic [31:0] alu_result;
-wire [31:0] alu_second_src;
-// alu second src mux
-assign alu_second_src = is_operand_imm ? signed_imm : reg_read_data_two;
-alu a(d_out_clk, reg_read_data_one, alu_second_src, alu_result, x_clk_out);
-
-// Memory Access internal state
-logic m_clk_out;
-mem_access m(x_clk_out, mem_read, mem_write, alu_result, dmem_data, dmem_addr, dmem_wen, m_clk_out);
-
-// Writeback
-wire [31:0] wb_data;
-assign wb_data = is_data_mem ? dmem_data : alu_result;
+logic [31:0] id_ex_signed_imm, id_ex_reg_read_data_one, id_ex_reg_read_data_two;
+logic [3:0] id_ex_alu_op;
+logic [4:0] id_ex_rd;
 
 always @ (posedge clk) begin
-    // fetch (1 CC)
-    // decode (1 CC)
-    // Execute ( N CCs) (Called by decoder, decoder will then "hand back" the clock
-    // TODO: ask what "memory access" means, how is that different from execute? (eg load/store)
-    // Update registers (1 CC), including pc
+    // Control Propagation
+    id_ex_branch <= d_branch;
+    id_ex_mem_read <= d_mem_read;
+    id_ex_mem_write <= d_mem_write;
+    id_ex_mem_to_reg <= d_mem_to_reg;
+    id_ex_mem_write <= d_mem_write;
+    id_ex_is_operand_imm <= d_is_operand_imm;
+    id_ex_reg_write <= d_reg_write;
+
+    // Data Propagation
+    id_ex_reg_read_data_one <= d_reg_read_data_one;
+    id_ex_reg_read_data_two <= d_reg_read_data_two;
+    id_ex_rd <= d_rd;
+    id_ex_signed_imm <= d_signed_imm;
 end
+
+
+// ********************************
+// *            Execute           *
+// ********************************
+
+// TODO: forwarding unit
+
+wire [31:0] x_alu_second_src;
+logic [31:0] x_alu_result;
+
+// alu second src mux
+assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two;
+alu a(reg_read_data_one, 
+      id_ex_alu_op, x_alu_second_src, 
+      x_alu_result);
+
+logic ex_mem_mem_to_reg;
+logic ex_mem_branch, ex_mem_mem_read, ex_mem_mem_write;
+logic [4:0] ex_mem_rd;
+logic [31:0] ex_mem_alu_result, ex_mem_reg_read_data_two;
+logic ex_mem_reg_write;
+
+always @ (posedge clk) begin
+    // Control Propagation
+    ex_mem_branch <= id_ex_branch;
+    ex_mem_mem_read <= id_ex_mem_read;
+    ex_mem_mem_write <= id_ex_mem_write;
+    ex_mem_mem_to_reg <= id_ex_mem_to_reg;
+    ex_mem_reg_write <= id_ex_reg_write;
+
+    // Data Propagation
+    ex_mem_alu_result <= x_alu_result;
+    ex_mem_reg_read_data_two <= id_ex_reg_read_data_two;
+    ex_mem_rd <= id_ex_rd;
+end
+
+// ********************************
+// *        Memory Access         *
+// ********************************
+
+logic [31:0] m_read_data;
+
+mem_access m(ex_mem_mem_read, 
+             ex_mem_mem_write, 
+             ex_mem_alu_result, ex_mem_reg_read_data_two,
+             // dmem_data,
+             m_read_data,
+             dmem_addr, 
+             dmem_wen);
+
+logic mem_wb_reg_write, mem_wb_mem_to_reg;
+logic [4:0] mem_wb_rd;
+logic [31:0] mem_wb_read_data, mem_wb_alu_result;
+
+always @ (posedge clk) begin
+    // Control Propagation
+    mem_wb_reg_write <= ex_mem_reg_write;
+    mem_wb_mem_to_reg <= ex_mem_mem_to_reg;
+
+    // Data Propagation
+    mem_wb_read_data <= m_read_data;
+    mem_wb_alu_result <= ex_mem_alu_result;
+    mem_wb_rd <= ex_mem_rd;
+end
+
+// ********************************
+// *           Writeback          *
+// ********************************
+logic w_reg_write;
+
+wire [31:0] w_data;
+assign w_data = mem_wb_mem_to_reg ? mem_wb_read_data : mem_wb_alu_result;
+logic [31:0] reg_write_data;
+write_back wb(w_data, mem_wb_reg_write, reg_write_data);
+
+// ********************************
+// *           Registers          *
+// ********************************
+
+registers rf(mem_wb_reg_write, 
+             d_rs1, d_rs2, mem_wb_rd, 
+             reg_write_data, 
+             d_reg_read_data_one, 
+             d_reg_read_data_two);
 
 endmodule
