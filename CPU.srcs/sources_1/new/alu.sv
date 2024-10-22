@@ -21,11 +21,9 @@
 
 // TODO: Branch flags, ALU is responsible for comparison!
 module alu(
-    input clk,
     input logic [31:0] data_one, data_two,
     input logic [15:0] alu_op,
-    output logic [31:0] result,
-    output logic clk_out
+    output logic [31:0] result
 );
 
 endmodule
