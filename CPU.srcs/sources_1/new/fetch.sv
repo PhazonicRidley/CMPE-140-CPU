@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+//basic test pass
 module fetch(
     input clk,
     input [31:0] pc, imem_insn,
@@ -33,7 +33,6 @@ module fetch(
         instruction <= imem_insn;
         new_pc <= pc + 4; //increment pc 4
     end 
-    always @(posedge clk or negedge clk) begin
-        out_clk <= clk;
-    end   
+    assign out_clk = clk;
+       
 endmodule

@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+//Basic Test Pass
 module decode(
     input clk,
     input [31:0] instruction,
@@ -72,7 +72,5 @@ module decode(
         reg_data_two <= rs2;      
     end
     
-    always @(posedge clk or negedge clk) begin
-        clk_out <= clk;
-    end
+    assign clk_out = clk;
 endmodule
