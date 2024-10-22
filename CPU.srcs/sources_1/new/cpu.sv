@@ -106,14 +106,20 @@ end
 // *            Execute           *
 // ********************************
 
-// TODO: forwarding unit
-
+logic [1:0] forward_a, forward_b;
 wire [31:0] x_alu_second_src;
+wire [31:0] x_alu_first_src;
+forwarding fwd(id_ex_reg_read_data_one, id_ex_reg_read_data_two, id_ex_mem_write, id_ex_reg_write, forward_a, forward_b);
+
+// TODO: forwarding unit
+assign x_alu_first_src = (forward_a == 2'b10) ? id_ex_mem_write : ((forward_a == 2'b01) ? id_ex_reg_write : id_ex_reg_read_data_one);
+assign x_alu_second_src = (forward_b == 2'b10) ? id_ex_mem_write : ((forward_b == 2'b01) ? id_ex_reg_write : id_ex_reg_read_data_two);
+
 logic [31:0] x_alu_result;
 
 // alu second src mux
-assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two;
-alu a(id_ex_reg_read_data_one, x_alu_second_src,
+//assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two;
+alu a(x_alu_first_src, x_alu_second_src,
       id_ex_alu_op, x_alu_result);
 
 logic ex_mem_mem_to_reg;

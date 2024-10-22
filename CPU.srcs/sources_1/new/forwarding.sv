@@ -30,7 +30,7 @@ module forwarding(
 always_comb begin
     fwda <= 2'b00;
     fwdb <= 2'b00;
-    
+
     if(exmem_rd == idex_rs1 && exmem_rd != 0) begin
         fwda <= 2'b10;
     end
