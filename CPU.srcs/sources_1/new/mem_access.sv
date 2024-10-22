@@ -28,6 +28,12 @@ module mem_access(
     output logic [31:0] dmem_addr,
     output logic dmem_wen
  );
+ 
+ always_comb begin
+    read_data <= 0;
+    dmem_addr <= 0;
+    dmem_wen <= 0;
+ end
 /*always @ (posedge clk) begin
     if (mem_read && !mem_write) begin
         // Address dmem_addr and get data   

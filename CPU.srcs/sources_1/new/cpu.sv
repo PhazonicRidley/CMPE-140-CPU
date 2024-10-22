@@ -29,11 +29,9 @@ module cpu(
     output logic dmem_wen // 1 = W, 0 = R
 );
  
-always @ (negedge rst_n) begin
-    imem_addr = 0;
-    dmem_addr = 0;
-    dmem_wen = 0;
-end
+//always @ (negedge rst_n) begin
+    // TODO
+//end
 
 // Program Counter Register
 // TODO: Propagate PC state to MEM stage for jumping.
@@ -64,9 +62,10 @@ logic d_branch, d_mem_read, d_mem_write,
 logic [3:0] d_alu_op;
 // Ensure that mem_read and/or mem_write are ONLY set when theres a valid memory address.
 decode d(if_id_instruction, d_rs1, d_rs2, d_rd, 
-         d_signed_imm, d_alu_op,
-         d_branch, d_mem_read, d_mem_to_reg, d_mem_write, 
-         d_is_operand_imm, d_reg_write);
+        d_reg_read_data_one, d_reg_read_data_two,
+         d_signed_imm, d_branch, d_mem_read, 
+         d_mem_to_reg, d_mem_write, 
+         d_is_operand_imm, d_reg_write, d_alu_op);
 
 logic id_ex_branch, id_ex_mem_read, id_ex_mem_to_reg;
 // ALUSrc -> is_operand_imm
@@ -106,9 +105,8 @@ logic [31:0] x_alu_result;
 
 // alu second src mux
 assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two;
-alu a(reg_read_data_one, 
-      id_ex_alu_op, x_alu_second_src, 
-      x_alu_result);
+alu a(id_ex_reg_read_data_one, x_alu_second_src,
+      id_ex_alu_op, x_alu_result);
 
 logic ex_mem_mem_to_reg;
 logic ex_mem_branch, ex_mem_mem_read, ex_mem_mem_write;

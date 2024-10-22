@@ -28,7 +28,7 @@ module alu(
 
 always_comb begin
     if(alu_op == 4'b0) begin
-        result <= data_one + data_two; //alu result (for addi only for now)
+        result = data_one + data_two; //alu result (for addi only for now)
     end
 end    
 endmodule

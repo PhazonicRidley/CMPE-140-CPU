@@ -34,40 +34,40 @@ module decode(
     reg [11:0] imm;
     
     always_comb begin
-        opcode <= instruction[6:0];
-        rd <= instruction[11:7];
-        func3 <= instruction[14:12];
-        rs1 <= instruction[19:15];
-        rs2 <= instruction[24:20];
-        imm <= instruction[31:20];
-        signed_imm <= { {20{imm[11]}},imm };
+        opcode = instruction[6:0];
+        rd = instruction[11:7];
+        func3 = instruction[14:12];
+        rs1 = instruction[19:15];
+        rs2 = instruction[24:20];
+        imm = instruction[31:20];
+        signed_imm = { {20{imm[11]}},imm };
         case (opcode) 
         7'b0010011: begin
-            branch <= 1'b0;
-            mem_read <= 1'b0;
-            mem_to_reg <= 1'b0;
-            mem_write <= 1'b0;
-            alu_src <= 1'b0;
-            reg_write <= 1'b0;
+            branch = 1'b0;
+            mem_read = 1'b0;
+            mem_to_reg = 1'b0;
+            mem_write = 1'b0;
+            alu_src = 1'b0;
+            reg_write = 1'b0;
             //add
             if(func3 == 3'b000) begin
-                alu_op <= 4'b0000; //for addition
+                alu_op = 4'b0000; //for addition
             end
             else begin
-                alu_op <= 4'b1101;
+                alu_op = 4'b1101;
             end
         end
         default: begin
-            branch <= 1'b0;
-            mem_read <= 1'b0;
-            mem_to_reg <= 1'b0;
-            mem_write <= 1'b0;
-            alu_src <= 1'b0;
-            reg_write <= 1'b0;
-            alu_op <= 4'b1111; //no operator assigned with this 
+            branch = 1'b0;
+            mem_read = 1'b0;
+            mem_to_reg = 1'b0;
+            mem_write = 1'b0;
+            alu_src = 1'b0;
+            reg_write = 1'b0;
+            alu_op = 4'b1111; //no operator assigned with this 
         end
         endcase
-        reg_data_one <= rs1;
-        reg_data_two <= rs2;      
+        reg_data_one = rs1;
+        reg_data_two = rs2;      
     end
 endmodule

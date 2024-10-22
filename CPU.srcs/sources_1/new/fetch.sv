@@ -27,8 +27,8 @@ module fetch(
     );
         
     always_comb begin
-        imem_addr <= pc; //set address to pc
-        instruction <= imem_insn;
-        new_pc <= pc + 4; //increment pc 4
+        imem_addr = pc; //set address to pc
+        instruction = imem_insn;
+        new_pc = pc + 4; //increment pc 4
     end   
 endmodule

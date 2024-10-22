@@ -25,6 +25,4 @@ module write_back(
     input reg_write,
     output logic [31:0] write_out
  );
-   assign reg_write = 420;
-   
 endmodule
