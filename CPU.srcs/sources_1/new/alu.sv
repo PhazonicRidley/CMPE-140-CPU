@@ -21,18 +21,14 @@
 
 // TODO: Branch flags, ALU is responsible for comparison!
 module alu(
-    input clk,
     input logic [31:0] data_one, data_two,
     input logic [3:0] alu_op,
-    output logic [31:0] result,
-    output logic clk_out
+    output logic [31:0] result
 );
-    
-always @(posedge clk) begin
+
+always_comb begin
     if(alu_op == 4'b0) begin
         result <= data_one + data_two; //alu result (for addi only for now)
     end
-end
-
-assign clk_out = clk;
+end    
 endmodule

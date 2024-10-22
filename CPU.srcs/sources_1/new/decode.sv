@@ -21,12 +21,11 @@
 
 //Basic Test Pass
 module decode(
-    input clk,
     input [31:0] instruction,
     output logic [4:0] rs1, rs2, rd,
     output logic [31:0] reg_data_one, reg_data_two,
     output logic signed [31:0] signed_imm,
-    output logic branch, mem_read, mem_to_reg, mem_write, alu_src, reg_write, clk_out,
+    output logic branch, mem_read, mem_to_reg, mem_write, alu_src, reg_write,
     output logic [3:0] alu_op
     );
     
@@ -34,7 +33,7 @@ module decode(
     reg [2:0]  func3;
     reg [11:0] imm;
     
-    always @(posedge clk) begin
+    always_comb begin
         opcode <= instruction[6:0];
         rd <= instruction[11:7];
         func3 <= instruction[14:12];
@@ -71,6 +70,4 @@ module decode(
         reg_data_one <= rs1;
         reg_data_two <= rs2;      
     end
-    
-    assign clk_out = clk;
 endmodule
