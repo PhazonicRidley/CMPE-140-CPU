@@ -18,6 +18,12 @@ module pipeline_tb();
         forever #5 clk = ~clk; // 10ns period (100MHz)
     end
     
+    reg [31:0] dmem [0:255];
+    
+   initial begin
+        $readmemh("hazards.bin", dmem); // Load data from dummy.bin into dmem
+    end
+    
     // Test stimulus
     initial begin
         // Initialize signals
@@ -49,5 +55,8 @@ module pipeline_tb();
         $dumpfile("pipeline_tb.vcd");
         $dumpvars(0, pipeline_tb);
     end
+        
+    assign dmem_data = dmem[dmem_addr[7:0]]; // Assuming dmem_addr is 8 bits for indexing
+
     
 endmodule
