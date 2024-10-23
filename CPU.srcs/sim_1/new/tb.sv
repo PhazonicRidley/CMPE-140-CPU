@@ -51,20 +51,20 @@ cpu dut
 );
     
     // Change to the file you need
-rom #( .addr_width (address_size), .data_width (word_size), .init_file ("addi_hazards.dat") )
+rom #( .addr_width (address_size), .data_width (word_size), .init_file ("nohazards.bin") )
 imem (
 .addr(imem_addr),
 .data(imem_insn)
 );
 
-ram #( .addr_width (address_size), .data_width (word_size), .init_file ("dummy.dat") )
-dmem (
-.rst_n (rst_n),
-.clk (clk),
-.wen (dmem_wen),
-.addr (dmem_addr),
-.data (dmem_data)
-);
+//ram #( .addr_width (address_size), .data_width (word_size), .init_file ("dummy.dat") )
+//dmem (
+//.rst_n (rst_n),
+//.clk (clk),
+//.wen (dmem_wen),
+//.addr (dmem_addr),
+//.data (dmem_data)
+//);
     
     
     
