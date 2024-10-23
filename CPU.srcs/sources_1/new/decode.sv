@@ -25,7 +25,7 @@ module decode(
     output logic [4:0] rs1, rs2, rd,
     output logic [31:0] reg_data_one, reg_data_two,
     output logic signed [31:0] signed_imm,
-    output logic branch, mem_read, mem_to_reg, mem_write, alu_src, reg_write,
+    output logic branch, mem_read, mem_to_reg, mem_write, is_operand_imm, reg_write,
     output logic [3:0] alu_op
     );
     
@@ -47,7 +47,7 @@ module decode(
             mem_read = 1'b0;
             mem_to_reg = 1'b0;
             mem_write = 1'b0;
-            alu_src = 1'b0;
+            is_operand_imm = 1'b1;
             reg_write = 1'b0;
             //add
             if(func3 == 3'b000) begin
@@ -62,7 +62,7 @@ module decode(
             mem_read = 1'b0;
             mem_to_reg = 1'b0;
             mem_write = 1'b0;
-            alu_src = 1'b0;
+            is_operand_imm = 1'b1;
             reg_write = 1'b0;
             alu_op = 4'b1111; //no operator assigned with this 
         end
