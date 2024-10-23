@@ -28,20 +28,20 @@ module forwarding(
 );
 
 always_comb begin
-    fwda <= 2'b00;
-    fwdb <= 2'b00;
+    fwda = 2'b00;
+    fwdb = 2'b00;
 
     if(exmem_rd == idex_rs1 && exmem_rd != 0) begin
-        fwda <= 2'b10;
+        fwda = 2'b10;
     end
     else if(memwb_rd == idex_rs1 && memwb_rd != 0) begin
-        fwda <= 2'b01;
+        fwda = 2'b01;
     end
     if(exmem_rd == idex_rs2 && exmem_rd != 0) begin
-        fwdb <= 2'b10;
+        fwdb = 2'b10;
     end
     else if(memwb_rd == idex_rs2 && memwb_rd != 0) begin
-        fwdb <= 2'b01;
+        fwdb = 2'b01;
     end
 end
 endmodule
