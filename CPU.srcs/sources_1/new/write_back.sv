@@ -21,8 +21,9 @@
 
 
 module write_back(
-    input [31:0] data,
-    input reg_write,
+    input [31:0] mem_data, reg_data,
+    input mem_to_reg,
     output logic [31:0] write_out
  );
+    assign write_out = mem_to_reg ? mem_data : reg_data;
 endmodule

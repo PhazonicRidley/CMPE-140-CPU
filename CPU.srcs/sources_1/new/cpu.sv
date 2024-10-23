@@ -26,7 +26,9 @@ module cpu(
     input [31:0] imem_insn,
     output logic [31:0] dmem_addr,
     inout logic [31:0] dmem_data,
-    output logic dmem_wen // 1 = W, 0 = R
+    output logic dmem_wen, // 1 = W, 0 = R
+    output [31:0] reg_write_data,
+    output [4:0] rd_out
 );
  
 //always @ (negedge rst_n) begin
@@ -70,7 +72,7 @@ logic d_branch, d_mem_read, d_mem_write,
 logic [3:0] d_alu_op;
 // Ensure that mem_read and/or mem_write are ONLY set when theres a valid memory address.
 decode d(if_id_instruction, d_rs1, d_rs2, d_rd, 
-        d_reg_read_data_one, d_reg_read_data_two,
+      //  d_reg_read_data_one, d_reg_read_data_two,
          d_signed_imm, d_branch, d_mem_read, 
          d_mem_to_reg, d_mem_write, 
          d_is_operand_imm, d_reg_write, d_alu_op);
@@ -82,7 +84,7 @@ logic id_ex_reg_write;
 
 logic [31:0] id_ex_signed_imm, id_ex_reg_read_data_one, id_ex_reg_read_data_two;
 logic [3:0] id_ex_alu_op;
-logic [4:0] id_ex_rd;
+logic [4:0] id_ex_rs1, id_ex_rs2, id_ex_rd;
 
 always @ (posedge clk) begin
     // Control Propagation
@@ -93,10 +95,13 @@ always @ (posedge clk) begin
     id_ex_mem_write <= d_mem_write;
     id_ex_is_operand_imm <= d_is_operand_imm;
     id_ex_reg_write <= d_reg_write;
+    id_ex_alu_op <= d_alu_op;
 
     // Data Propagation
     id_ex_reg_read_data_one <= d_reg_read_data_one;
     id_ex_reg_read_data_two <= d_reg_read_data_two;
+    id_ex_rs1 <= d_rs1;
+    id_ex_rs2 <= d_rs2;
     id_ex_rd <= d_rd;
     id_ex_signed_imm <= d_signed_imm;
 end
@@ -107,17 +112,38 @@ end
 // ********************************
 
 logic [1:0] forward_a, forward_b;
-wire [31:0] x_alu_second_src;
-wire [31:0] x_alu_first_src;
-logic [4:0] mem_wb_rd; // TODO: restructure declarations
-logic [31:0] reg_write_data;
+logic [31:0] x_alu_second_src;
+logic [31:0] x_alu_first_src;
+logic [31:0] x_reg_src;
 logic [31:0] ex_mem_alu_result, ex_mem_reg_read_data_two;
 
-forwarding fwd(id_ex_rs1, id_ex_rs2, id_ex_rd, mem_wb_rd, forward_a, forward_b);
+// TODO: restructure declarations
+logic [4:0] mem_wb_rd; 
+logic [31:0] wb_reg_write_data;
+logic [4:0] ex_mem_rd;
+
+
+forwarding fwd(id_ex_rs1, id_ex_rs2, ex_mem_rd, mem_wb_rd, forward_a, forward_b);
 
 // TODO: forwarding unit
-assign x_alu_first_src = (forward_a == 2'b10) ? ex_mem_alu_result : ((forward_a == 2'b01) ? reg_write_data : (id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_one));
-assign x_alu_second_src = (forward_b == 2'b10) ? ex_mem_alu_result : ((forward_b == 2'b01) ? reg_write_data : (id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two));
+
+always_comb begin
+    // First source mux
+    case (forward_a)
+        2'b10   : x_alu_first_src = ex_mem_alu_result;
+        2'b01   : x_alu_first_src = wb_reg_write_data;
+        default : x_alu_first_src = id_ex_reg_read_data_one;
+    endcase
+
+    // Second source mux
+    case (forward_b)
+        2'b10   : x_reg_src = ex_mem_alu_result;
+        2'b01   : x_reg_src = wb_reg_write_data;
+        default : x_reg_src = id_ex_reg_read_data_two;
+    endcase
+end
+
+assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : x_reg_src;
 
 logic [31:0] x_alu_result;
 
@@ -128,7 +154,6 @@ alu a(x_alu_first_src, x_alu_second_src,
 
 logic ex_mem_mem_to_reg;
 logic ex_mem_branch, ex_mem_mem_read, ex_mem_mem_write;
-logic [4:0] ex_mem_rd;
 logic ex_mem_reg_write;
 
 always @ (posedge clk) begin
@@ -144,8 +169,6 @@ always @ (posedge clk) begin
     ex_mem_reg_read_data_two <= id_ex_reg_read_data_two;
     ex_mem_rd <= id_ex_rd;
 end
-
-assign dmem_data = x_alu_result;
 
 // ********************************
 // *        Memory Access         *
@@ -179,19 +202,19 @@ end
 // ********************************
 // *           Writeback          *
 // ********************************
-logic w_reg_write;
 
-wire [31:0] w_data;
-assign w_data = mem_wb_mem_to_reg ? mem_wb_read_data : mem_wb_alu_result;
-write_back wb(w_data, mem_wb_reg_write, reg_write_data);
+write_back wb(mem_wb_read_data, mem_wb_alu_result, mem_wb_mem_to_reg, wb_reg_write_data);
+// assign dmem_data = wb_reg_write_data;
+assign reg_write_data = wb_reg_write_data;
+assign rd_out = mem_wb_rd;
 
 // ********************************
 // *           Registers          *
 // ********************************
 
-registers rf(mem_wb_reg_write, 
+registers rf(clk, mem_wb_reg_write, 
              d_rs1, d_rs2, mem_wb_rd, 
-             reg_write_data, 
+             wb_reg_write_data, 
              d_reg_read_data_one, 
              d_reg_read_data_two);
 

@@ -29,10 +29,14 @@ module registers(
     output logic [31:0] read_data_one,
     output logic [31:0] read_data_two
 );
-
-    logic [31:0] registers[32];
+    
+    logic dummy;
+    logic [31:0] registers[32] = '{default: 0};
     always_ff @ (posedge clk) begin
-        if (write_en && rd != 0) registers[rd] <= write_data;
+        dummy <= 1;
+        if (write_en && rd != 0) begin 
+            registers[rd] <= write_data;
+        end
     end
     
     always_comb begin

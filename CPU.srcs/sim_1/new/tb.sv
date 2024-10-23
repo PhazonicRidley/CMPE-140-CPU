@@ -43,6 +43,8 @@ wire [word_size-1:0] imem_insn;
 wire [address_size-1:0] dmem_addr;
 wire [word_size-1:0] dmem_data;
 wire dmem_wen;
+wire [address_size-1:0] reg_write_data;
+wire [4:0] rd_out;
 
 
 cpu dut 
@@ -51,7 +53,7 @@ cpu dut
 );
     
     // Change to the file you need
-rom #( .addr_width (address_size), .data_width (word_size), .init_file ("addi_nohazard.dat") )
+rom #( .addr_width (address_size), .data_width (word_size), .init_file ("addi_hazards.dat") )
 imem (
 .addr(imem_addr),
 .data(imem_insn)
