@@ -98,13 +98,14 @@ always @ (posedge clk) begin
     id_ex_alu_op <= d_alu_op;
 
     // Data Propagation
-    id_ex_reg_read_data_one <= d_reg_read_data_one;
-    id_ex_reg_read_data_two <= d_reg_read_data_two;
+//    id_ex_reg_read_data_one <= d_reg_read_data_one;
+//    id_ex_reg_read_data_two <= d_reg_read_data_two;
     id_ex_rs1 <= d_rs1;
     id_ex_rs2 <= d_rs2;
     id_ex_rd <= d_rd;
     id_ex_signed_imm <= d_signed_imm;
 end
+
 
 
 // ********************************
@@ -213,9 +214,9 @@ assign rd_out = mem_wb_rd;
 // ********************************
 
 registers rf(clk, mem_wb_reg_write, 
-             d_rs1, d_rs2, mem_wb_rd, 
+             id_ex_rs1, id_ex_rs1, mem_wb_rd, 
              wb_reg_write_data, 
-             d_reg_read_data_one, 
-             d_reg_read_data_two);
+             id_ex_reg_read_data_one, 
+             id_ex_reg_read_data_two);
 
 endmodule
