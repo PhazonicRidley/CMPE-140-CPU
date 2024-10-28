@@ -32,11 +32,13 @@ module decode(
     reg [6:0] opcode;
     reg [2:0]  func3;
     reg [11:0] imm;
+    reg [6:0] func7;
     
     always_comb begin
         opcode = instruction[6:0];
         rd = instruction[11:7];
         func3 = instruction[14:12];
+        func7 = instruction[31:25];
         rs1 = instruction[19:15];
         rs2 = instruction[24:20];
         imm = instruction[31:20];
@@ -49,13 +51,28 @@ module decode(
             mem_write = 1'b0;
             is_operand_imm = 1'b1;
             reg_write = 1'b1;
-            //add
-            if(func3 == 3'b000) begin
-                alu_op = 4'b0000; //for addition
-            end
-            else begin
-                alu_op = 4'b1101;
-            end
+            //func3 to alu_op assignment
+            case (func3)
+                3'b010  : alu_op = 4'b0010; //slti
+                3'b011  : alu_op = 4'b0011; //sltiu
+                3'b100  : alu_op = 4'b0100; //xori
+                3'b110  : alu_op = 4'b0110; //ori
+                3'b111  : alu_op = 4'b0111; //andi
+                3'b001  : alu_op = 4'b0001; //slli
+                3'b101  : begin
+                    if (func7 == 7'b0100000) begin
+                        signed_imm = 0;
+                        signed_imm = instruction[24:20];
+                        alu_op = 4'b0101;
+                    end
+                    else begin
+                        signed_imm = 0;
+                        signed_imm = instruction[24:20];
+                        alu_op = 4'b1000;
+                    end
+                end 
+                default : alu_op = 4'b0000;
+            endcase 
         end
         default: begin
             branch = 1'b0;
@@ -64,8 +81,8 @@ module decode(
             mem_write = 1'b0;
             is_operand_imm = 1'b1;
             reg_write = 1'b0;
-            alu_op = 4'b1111; //no operator assigned with this 
-        end
+            alu_op = 4'b1111; //no operator assigned with this
+        end 
         endcase
 //        reg_data_one = rs1;
 //        reg_data_two = rs2;      
