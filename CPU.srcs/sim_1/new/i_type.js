@@ -15,6 +15,6 @@ console.log(`t3 = t3 ^ -1:  0x${(t3 >>> 0).toString(16)}`)
 t5 = t1 & 0x7f0
 console.log(`t5 = t1 & 0x7f0: 0x${(t5 >>> 0).toString(16)}`)
 let t6 = t4 | 0x7f0
-console.log(`t6 = t4 | 0x7f0: 0x${(t6 >>> 0).toString(16)}`)
+console.log(`t6 = t4 | 0x7f0: 0x${(t6 >> 0).toString(16)}`)
 t0 = t3 < 0x123
 console.log(`t0 = t3 < 0x123: ${t0}`)

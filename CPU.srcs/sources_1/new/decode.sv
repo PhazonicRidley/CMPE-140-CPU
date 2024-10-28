@@ -32,11 +32,13 @@ module decode(
     reg [6:0] opcode;
     reg [2:0]  func3;
     reg [11:0] imm;
+    reg [6:0] func7;
     
     always_comb begin
         opcode = instruction[6:0];
         rd = instruction[11:7];
         func3 = instruction[14:12];
+        func7 = instruction[31:25];
         rs1 = instruction[19:15];
         rs2 = instruction[24:20];
         imm = instruction[31:20];
@@ -58,10 +60,14 @@ module decode(
                 3'b111  : alu_op = 4'b0111; //andi
                 3'b001  : alu_op = 4'b0001; //slli
                 3'b101  : begin
-                    if (imm[11:5] == 7'b0100000) begin
+                    if (func7 == 7'b0100000) begin
+                        signed_imm = 0;
+                        signed_imm = instruction[24:20];
                         alu_op = 4'b0101;
                     end
                     else begin
+                        signed_imm = 0;
+                        signed_imm = instruction[24:20];
                         alu_op = 4'b1000;
                     end
                 end 
