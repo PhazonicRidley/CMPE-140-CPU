@@ -20,9 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-parameter [6:0] i_type_ld = 'h3;
-parameter [6:0] i_type_alu = 'h13;
-parameter [6:0] i_type_jal = 'h67;
+parameter [6:0] i_type_ld = 'h3,
+                i_type_alu = 'h13,
+                i_type_jal = 'h67,
+                r_type = 'h33;
 
 
 module decode(
@@ -47,66 +48,44 @@ module decode(
         rs1 = instruction[19:15];
         rs2 = instruction[24:20];
         imm = instruction[31:20];
-        msb_alu_op = func7[5];
+        msb_alu_op = 0;
+        signed_imm = { {20{imm[11]}},imm };
         
         case (opcode) 
-        i_type_alu: begin
-            if (func3 == 'b1 || func3 == 'b101) signed_imm = { {25{32'b0}},rs2 }; // rs2 = shamt
-            else signed_imm = { {20{imm[11]}},imm };
+            i_type_alu: begin
+                if (func3 == 'b1 || func3 == 'b101) msb_alu_op = func7[5]; 
+                branch = 0;
+                mem_read = 0;
+                mem_to_reg = 0;
+                mem_write = 0;
+                is_operand_imm = 1;
+                reg_write = 1;
+                alu_op = {msb_alu_op, func3};
             
-            branch = 0;
-            mem_read = 0;
-            mem_to_reg = 0;
-            mem_write = 0;
-            is_operand_imm = 1;
-            reg_write = 1;
+            end
             
-            alu_op = {msb_alu_op, func3};
+            r_type: begin
+                msb_alu_op = func7[5];
+                branch = 0;
+                mem_read = 0;
+                mem_to_reg = 0;
+                mem_write = 0;
+                is_operand_imm = 0;
+                reg_write = 1;
+                alu_op = {msb_alu_op, func3};
+                signed_imm = -1;
+            end
             
-        end
-        
-        
-        /*
-        7'b0010011: begin
-            branch = 1'b0;
-            mem_read = 1'b0;
-            mem_to_reg = 1'b0;
-            mem_write = 1'b0;
-            is_operand_imm = 1'b1;
-            reg_write = 1'b1;
-            //func3 to alu_op assignment
-            case (func3)
-                3'b010  : alu_op = 4'b0010; //slti
-                3'b011  : alu_op = 4'b0011; //sltiu
-                3'b100  : alu_op = 4'b0100; //xori
-                3'b110  : alu_op = 4'b0110; //ori
-                3'b111  : alu_op = 4'b0111; //andi
-                3'b001  : alu_op = 4'b0001; //slli
-                3'b101  : begin
-                    if (func7 == 7'b0100000) begin
-                        signed_imm = 0;
-                        signed_imm = instruction[24:20];
-                        alu_op = 4'b0101;
-                    end
-                    else begin
-                        signed_imm = 0;
-                        signed_imm = instruction[24:20];
-                        alu_op = 4'b1000;
-                    end
-                end 
-                default : alu_op = 4'b0000;
-            endcase 
-        end */
-        default: begin
-            branch = 1'b0;
-            mem_read = 1'b0;
-            mem_to_reg = 1'b0;
-            mem_write = 1'b0;
-            is_operand_imm = 1'b0;
-            reg_write = 1'b0;
-            alu_op = 4'b1111; //no operator assigned with this
-            signed_imm = 0;
-        end 
+            default: begin
+                branch = 1'b0;
+                mem_read = 1'b0;
+                mem_to_reg = 1'b0;
+                mem_write = 1'b0;
+                is_operand_imm = 1'b0;
+                reg_write = 1'b0;
+                alu_op = 4'b1111; //no operator assigned with this
+                signed_imm = 0;
+            end 
         endcase  
     end
 endmodule

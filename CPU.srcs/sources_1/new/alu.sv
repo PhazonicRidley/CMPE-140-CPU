@@ -20,12 +20,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // TODO: Branch flags, ALU is responsible for comparison!
-parameter [3:0] add = 'bX000,
-                slt = 'bX010,
-                sltu = 'bX011,
-                eor = 'bX100,
-                bor = 'bX110,
-                band = 'bX111,
+parameter [3:0] add = 'b0000,
+                slt = 'b0010,
+                sltu = 'b0011,
+                eor = 'b0100,
+                bor = 'b0110,
+                band = 'b0111,
+                sub = 'b1000,
                 sll = 'b0001,
                 srl = 'b0101,
                 sra = 'b1101;
@@ -37,16 +38,17 @@ module alu(
 );
 
 always_comb begin
-    casex (alu_op)
+    case (alu_op)
         add: result = data_one + data_two;
         slt: result = data_one < data_two;
         sltu: result = $unsigned(data_one) < $unsigned(data_two);
         eor: result = data_one ^ data_two;
         bor: result = data_one | data_two;
         band: result = data_one & data_two;
-        sll: result = data_one << data_two;
-        srl: result = data_one >> data_two;
-        sra: result = data_one >>> data_two;
+        sub: result = data_one - data_two;
+        sll: result = data_one << data_two[4:0];
+        srl: result = data_one >> data_two[4:0];
+        sra: result = data_one >>> data_two[4:0];
         default: result = -1;
     endcase
     

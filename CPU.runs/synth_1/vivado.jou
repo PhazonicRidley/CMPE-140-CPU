@@ -1,14 +1,24 @@
 #-----------------------------------------------------------
-# Vivado v2023.2 (64-bit)
-# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
-# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
-# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
-# Start of session at: Mon Oct 21 21:38:14 2024
-# Process ID: 5140
-# Current directory: Z:/Documents/School/CMPE-140/Labs/CPU/CPU.runs/synth_1
-# Command line: vivado.exe -log cpu.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source cpu.tcl
-# Log file: Z:/Documents/School/CMPE-140/Labs/CPU/CPU.runs/synth_1/cpu.vds
-# Journal file: Z:/Documents/School/CMPE-140/Labs/CPU/CPU.runs/synth_1\vivado.jou
-# Running On: MADELINESCH77DA, OS: Windows, CPU Frequency: 3200 MHz, CPU Physical cores: 4, Host memory: 6436 MB
+# Vivado v2024.1 (64-bit)
+# SW Build 5076996 on Wed May 22 18:36:09 MDT 2024
+# IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+# SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+# Start of session at: Mon Nov  4 20:15:02 2024
+# Process ID: 70463
+# Current directory: /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.runs/synth_1
+# Command line: vivado -log cpu.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source cpu.tcl
+# Log file: /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.runs/synth_1/cpu.vds
+# Journal file: /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.runs/synth_1/vivado.jou
+# Running On        :RoboticsPC
+# Platform          :Ubuntu
+# Operating System  :Ubuntu 20.04.6 LTS
+# Processor Detail  :Intel(R) Core(TM) i5-4460  CPU @ 3.20GHz
+# CPU Frequency     :900.000 MHz
+# CPU Physical cores:4
+# CPU Logical cores :4
+# Host memory       :8194 MB
+# Swap memory       :2147 MB
+# Total Virtual     :10341 MB
+# Available Virtual :4830 MB
 #-----------------------------------------------------------
 source cpu.tcl -notrace

@@ -4,7 +4,7 @@
 
 set TIME_start [clock seconds] 
 namespace eval ::optrace {
-  variable script "Z:/Documents/School/CMPE-140/Labs/CPU/CPU.runs/synth_1/cpu.tcl"
+  variable script "/home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.runs/synth_1/cpu.tcl"
   variable category "vivado_synth"
 }
 
@@ -55,24 +55,9 @@ if {$::dispatch::connected} {
   }
 }
 
-proc create_report { reportName command } {
-  set status "."
-  append status $reportName ".fail"
-  if { [file exists $status] } {
-    eval file delete [glob $status]
-  }
-  send_msg_id runtcl-4 info "Executing : $command"
-  set retval [eval catch { $command } msg]
-  if { $retval != 0 } {
-    set fp [open $status w]
-    close $fp
-    send_msg_id runtcl-5 warning "$msg"
-  }
-}
 OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param checkpoint.writeSynthRtdsInDcp 1
-set_param chipscope.maxJobs 1
-set_param synth.incrementalSynthesisCache Z:/Documents/School/CMPE-140/Labs/CPU/.Xil/Vivado-6704-MADELINESCH77DA/incrSyn
+set_param synth.incrementalSynthesisCache ./.Xil/Vivado-6382-RoboticsPC/incrSyn
 set_msg_config -id {Common 17-41} -limit 10000000
 set_msg_config -id {Synth 8-256} -limit 10000
 set_msg_config -id {Synth 8-638} -limit 10000
@@ -83,22 +68,23 @@ create_project -in_memory -part xc7k70tfbv676-1
 set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
-set_property webtalk.parent_dir Z:/Documents/School/CMPE-140/Labs/CPU/CPU.cache/wt [current_project]
-set_property parent.project_path Z:/Documents/School/CMPE-140/Labs/CPU/CPU.xpr [current_project]
+set_property webtalk.parent_dir /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.cache/wt [current_project]
+set_property parent.project_path /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.xpr [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
-set_property ip_output_repo z:/Documents/School/CMPE-140/Labs/CPU/CPU.cache/ip [current_project]
+set_property ip_output_repo /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 OPTRACE "Creating in-memory project" END { }
 OPTRACE "Adding files" START { }
 read_verilog -library xil_defaultlib -sv {
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/alu.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/decode.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/fetch.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/mem_access.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/registers.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/write_back.sv
-  Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/sources_1/new/cpu.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/alu.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/decode.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/fetch.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/forwarding.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/mem_access.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/registers.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/write_back.sv
+  /home/madeline/Documents/Madeline-Class/CMPE-140-CPU/CPU.srcs/sources_1/new/cpu.sv
 }
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being
@@ -110,8 +96,6 @@ foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
 set_param ips.enableIPCacheLiteLoad 1
-
-read_checkpoint -auto_incremental -incremental Z:/Documents/School/CMPE-140/Labs/CPU/CPU.srcs/utils_1/imports/synth_1/cpu.dcp
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
@@ -128,7 +112,7 @@ set_param constraints.enableBinaryConstraints false
 write_checkpoint -force -noxdef cpu.dcp
 OPTRACE "write_checkpoint" END { }
 OPTRACE "synth reports" START { REPORT }
-create_report "synth_1_synth_report_utilization_0" "report_utilization -file cpu_utilization_synth.rpt -pb cpu_utilization_synth.pb"
+generate_parallel_reports -reports { "report_utilization -file cpu_utilization_synth.rpt -pb cpu_utilization_synth.pb"  } 
 OPTRACE "synth reports" END { }
 file delete __synthesis_is_running__
 close [open __synthesis_is_complete__ w]
