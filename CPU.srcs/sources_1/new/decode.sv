@@ -19,20 +19,25 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-//Basic Test Pass
+
+parameter [6:0] i_type_ld = 'h3;
+parameter [6:0] i_type_alu = 'h13;
+parameter [6:0] i_type_jal = 'h67;
+
+
 module decode(
     input [31:0] instruction,
     output logic [4:0] rs1, rs2, rd,
-  //  output logic [31:0] reg_data_one, reg_data_two,
     output logic signed [31:0] signed_imm,
     output logic branch, mem_read, mem_to_reg, mem_write, is_operand_imm, reg_write,
     output logic [3:0] alu_op
     );
     
-    reg [6:0] opcode;
-    reg [2:0]  func3;
-    reg [11:0] imm;
-    reg [6:0] func7;
+    logic [6:0] opcode, func7;
+    logic [2:0]  func3;
+    logic [11:0] imm;
+    logic msb_alu_op;
+    
     
     always_comb begin
         opcode = instruction[6:0];
@@ -42,8 +47,26 @@ module decode(
         rs1 = instruction[19:15];
         rs2 = instruction[24:20];
         imm = instruction[31:20];
-        signed_imm = { {20{imm[11]}},imm };
+        msb_alu_op = func7[5];
+        
         case (opcode) 
+        i_type_alu: begin
+            if (func3 == 'b1 || func3 == 'b101) signed_imm = { {25{32'b0}},rs2 }; // rs2 = shamt
+            else signed_imm = { {20{imm[11]}},imm };
+            
+            branch = 0;
+            mem_read = 0;
+            mem_to_reg = 0;
+            mem_write = 0;
+            is_operand_imm = 1;
+            reg_write = 1;
+            
+            alu_op = {msb_alu_op, func3};
+            
+        end
+        
+        
+        /*
         7'b0010011: begin
             branch = 1'b0;
             mem_read = 1'b0;
@@ -73,18 +96,17 @@ module decode(
                 end 
                 default : alu_op = 4'b0000;
             endcase 
-        end
+        end */
         default: begin
             branch = 1'b0;
             mem_read = 1'b0;
             mem_to_reg = 1'b0;
             mem_write = 1'b0;
-            is_operand_imm = 1'b1;
+            is_operand_imm = 1'b0;
             reg_write = 1'b0;
             alu_op = 4'b1111; //no operator assigned with this
+            signed_imm = 0;
         end 
-        endcase
-//        reg_data_one = rs1;
-//        reg_data_two = rs2;      
+        endcase  
     end
 endmodule
