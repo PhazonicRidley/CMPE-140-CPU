@@ -214,7 +214,7 @@ assign rd_out = mem_wb_rd;
 // ********************************
 
 registers rf(clk, mem_wb_reg_write, 
-             id_ex_rs1, id_ex_rs1, mem_wb_rd, 
+             id_ex_rs1, id_ex_rs2, mem_wb_rd, 
              wb_reg_write_data, 
              id_ex_reg_read_data_one, 
              id_ex_reg_read_data_two);
