@@ -38,12 +38,13 @@ module cpu(
 // Program Counter Register
 // TODO: Propagate PC state to MEM stage for jumping.
 logic [31:0] new_pc, pc = 0;
+import pipeline_registers_pkg::*;
 
 // ********************************
 // *            Fetch             *
 // ********************************
-
 logic [31:0] f_instruction;
+
 fetch f(pc, imem_insn, new_pc, imem_addr, f_instruction);
 
 always @ (posedge clk or negedge rst_n) begin
@@ -54,7 +55,6 @@ always @ (posedge clk or negedge rst_n) begin
     end
 end
 
-logic [31:0] if_id_instruction;
 always @ (posedge clk) begin
     // TODO: reset and write enable
     if_id_instruction <= f_instruction;
@@ -64,27 +64,17 @@ end
 // *            Decode            *
 // ********************************
 logic [4:0] d_rs1, d_rs2, d_rd;
-
 // TODO: Why does it say to extend imm up to 64 bits for a 32 bit CPU?
 logic [31:0] d_signed_imm, d_reg_read_data_one, d_reg_read_data_two;
 logic d_branch, d_mem_read, d_mem_write, 
     d_mem_to_reg, d_is_operand_imm, d_reg_write;
 logic [3:0] d_alu_op;
+
 // Ensure that mem_read and/or mem_write are ONLY set when theres a valid memory address.
 decode d(if_id_instruction, d_rs1, d_rs2, d_rd, 
-      //  d_reg_read_data_one, d_reg_read_data_two,
          d_signed_imm, d_branch, d_mem_read, 
          d_mem_to_reg, d_mem_write, 
          d_is_operand_imm, d_reg_write, d_alu_op);
-
-logic id_ex_branch, id_ex_mem_read, id_ex_mem_to_reg;
-// ALUSrc -> is_operand_imm
-logic id_ex_mem_write, id_ex_is_operand_imm;
-logic id_ex_reg_write;
-
-logic [31:0] id_ex_signed_imm, id_ex_reg_read_data_one, id_ex_reg_read_data_two;
-logic [3:0] id_ex_alu_op;
-logic [4:0] id_ex_rs1, id_ex_rs2, id_ex_rd;
 
 always @ (posedge clk) begin
     // Control Propagation
@@ -98,8 +88,6 @@ always @ (posedge clk) begin
     id_ex_alu_op <= d_alu_op;
 
     // Data Propagation
-//    id_ex_reg_read_data_one <= d_reg_read_data_one;
-//    id_ex_reg_read_data_two <= d_reg_read_data_two;
     id_ex_rs1 <= d_rs1;
     id_ex_rs2 <= d_rs2;
     id_ex_rd <= d_rd;
@@ -116,18 +104,11 @@ logic [1:0] forward_a, forward_b;
 logic [31:0] x_alu_second_src;
 logic [31:0] x_alu_first_src;
 logic [31:0] x_reg_src;
-logic [31:0] ex_mem_alu_result, ex_mem_reg_read_data_two;
-
-// TODO: restructure declarations
-logic [4:0] mem_wb_rd; 
-logic [31:0] wb_reg_write_data;
-logic [4:0] ex_mem_rd;
-
+logic [31:0] x_alu_result;
 
 forwarding fwd(id_ex_rs1, id_ex_rs2, ex_mem_rd, mem_wb_rd, forward_a, forward_b);
 
-// TODO: forwarding unit
-
+// Forwarding muxes
 always_comb begin
     // First source mux
     case (forward_a)
@@ -146,16 +127,8 @@ end
 
 assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : x_reg_src;
 
-logic [31:0] x_alu_result;
-
-// alu second src mux
-//assign x_alu_second_src = id_ex_is_operand_imm ? id_ex_signed_imm : id_ex_reg_read_data_two;
 alu a(x_alu_first_src, x_alu_second_src,
       id_ex_alu_op, x_alu_result);
-
-logic ex_mem_mem_to_reg;
-logic ex_mem_branch, ex_mem_mem_read, ex_mem_mem_write;
-logic ex_mem_reg_write;
 
 always @ (posedge clk) begin
     // Control Propagation
@@ -185,10 +158,6 @@ mem_access m(ex_mem_mem_read,
              dmem_addr, 
              dmem_wen);
 
-logic mem_wb_reg_write, mem_wb_mem_to_reg;
-
-logic [31:0] mem_wb_read_data, mem_wb_alu_result;
-
 always @ (posedge clk) begin
     // Control Propagation
     mem_wb_reg_write <= ex_mem_reg_write;
@@ -205,7 +174,6 @@ end
 // ********************************
 
 write_back wb(mem_wb_read_data, mem_wb_alu_result, mem_wb_mem_to_reg, wb_reg_write_data);
-// assign dmem_data = wb_reg_write_data;
 assign reg_write_data = wb_reg_write_data;
 assign rd_out = mem_wb_rd;
 
