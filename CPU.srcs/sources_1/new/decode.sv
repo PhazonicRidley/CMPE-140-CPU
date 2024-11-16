@@ -39,6 +39,7 @@ module decode(
     logic [11:0] imm;
     logic msb_alu_op;
     
+
     
     always_comb begin
         opcode = instruction[6:0];
@@ -87,5 +88,6 @@ module decode(
                 signed_imm = 0;
             end 
         endcase  
+
     end
 endmodule
