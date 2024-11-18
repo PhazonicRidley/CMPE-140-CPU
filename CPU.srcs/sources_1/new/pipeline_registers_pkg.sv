@@ -21,18 +21,18 @@
 
 
 package pipeline_registers_pkg;
-    logic [31:0] test;
-    
     
 // ********************************
 // *       Fetch -> Decode         *
 // ********************************
+logic if_id_write = 1;
 logic [31:0] if_id_instruction;
 
 // ********************************
 // *       Decode -> Execute      *
 // ********************************
 
+logic id_ex_write = 1;
 logic id_ex_branch, id_ex_mem_read, id_ex_mem_to_reg;
 // ALUSrc -> is_operand_imm
 logic id_ex_mem_write, id_ex_is_operand_imm;
@@ -45,6 +45,7 @@ logic [4:0] id_ex_rs1, id_ex_rs2, id_ex_rd;
 // ********************************
 // *   Execute -> Memory Access   *
 // ********************************
+logic ex_mem_write = 1;
 logic [4:0] ex_mem_rd;
 logic ex_mem_mem_to_reg;
 logic ex_mem_branch, ex_mem_mem_read, ex_mem_mem_write;
@@ -56,6 +57,7 @@ logic [31:0] ex_mem_alu_result, ex_mem_reg_read_data_two;
 // ********************************
 // *   Memory Access -> Writeback *
 // ********************************
+logic mem_wb_write = 1;
 logic [4:0] mem_wb_rd;
 logic mem_wb_reg_write, mem_wb_mem_to_reg;
 logic [31:0] mem_wb_read_data, mem_wb_alu_result;
