@@ -23,7 +23,8 @@
 parameter [6:0] i_type_ld = 'h3,
                 i_type_alu = 'h13,
                 i_type_jal = 'h67,
-                r_type = 'h33;
+                r_type = 'h33,
+                s_type = 'h23;
 
 
 module decode(
@@ -65,6 +66,15 @@ module decode(
             
             end
             
+            i_type_ld: begin
+                mem_read = 1'b1;
+                mem_to_reg = 1'b1;
+                reg_write = 1'b1;
+                is_operand_imm = 1'b1;
+                alu_op = 4'b0000;
+                signed_imm = {{20{instruction[31]}}, instruction[31:20]};
+            end
+            
             r_type: begin
                 msb_alu_op = func7[5];
                 branch = 0;
@@ -75,6 +85,13 @@ module decode(
                 reg_write = 1;
                 alu_op = {msb_alu_op, func3};
                 signed_imm = -1;
+            end
+            
+            s_type: begin
+                mem_write = 1'b1;
+                is_operand_imm = 1'b1;
+                alu_op = 4'b0000;
+                signed_imm = {{20{instruction[31]}}, instruction[31:25], instruction[11:7]};
             end
             
             default: begin
