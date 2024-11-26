@@ -21,6 +21,7 @@
 
 //basic test pass
 module fetch(
+    input rst,
     input [31:0] pc, imem_insn,
     output logic [31:0] new_pc, imem_addr,
     output logic [31:0] instruction
@@ -28,7 +29,7 @@ module fetch(
         
     always_comb begin
         imem_addr = pc; //set address to pc
-        instruction = imem_insn;
+        instruction = rst ? imem_insn : 0;
         new_pc = pc + 4; //increment pc 4
     end   
 endmodule

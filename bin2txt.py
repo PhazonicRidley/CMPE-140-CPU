@@ -15,7 +15,7 @@ except FileNotFoundError:
     print(f"File {args.binfile} doesn't exist")
     exit(1)
 
-if file_bytes is None:
+if not file_bytes:
     print("file_bytes not populated")
     exit(1)
 
@@ -23,7 +23,7 @@ txt_file = ""
 for byte in file_bytes:
     txt_file += f"{byte:08b}\n"
 
-with open(f"{args.binfile[:-4]}.txt", 'w') as f:
+with open(f"{args.binfile[:-4]}.dat", 'w') as f:
     f.write(txt_file)
 
-print(f"Wrote to {args.binfile[:-4]}.txt")
+print(f"Wrote to {args.binfile[:-4]}.dat")
