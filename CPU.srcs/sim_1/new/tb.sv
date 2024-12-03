@@ -43,6 +43,7 @@ wire [word_size-1:0] imem_insn;
 wire [address_size-1:0] dmem_addr;
 wire [word_size-1:0] dmem_data;
 wire dmem_wen;
+wire [3:0] byte_en;
 wire [address_size-1:0] reg_write_data;
 wire [4:0] rd_out;
 
@@ -53,20 +54,21 @@ cpu dut
 );
     
     // Change to the file you need
-rom #( .addr_width (address_size), .data_width (word_size), .init_file ("r_type.dat") )
+rom #( .addr_width (address_size), .data_width (word_size), .init_file ("ldst.dat") )
 imem (
 .addr(imem_addr),
 .data(imem_insn)
 );
 
-//ram #( .addr_width (address_size), .data_width (word_size), .init_file ("dummy.dat") )
-//dmem (
-//.rst_n (rst_n),
-//.clk (clk),
-//.wen (dmem_wen),
-//.addr (dmem_addr),
-//.data (dmem_data)
-//);
+ram #( .addr_width (address_size), .data_width (word_size), .init_file ("ram_test.dat") )
+dmem (
+.rst_n (rst_n),
+.clk (clk),
+.wen (dmem_wen),
+.byte_en (byte_en),
+.addr (dmem_addr),
+.data (dmem_data)
+);
     
     
     
