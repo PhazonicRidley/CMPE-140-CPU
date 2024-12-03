@@ -21,12 +21,12 @@
 
 // TODO: Handle branch stalls (control hazards)
 module stall_handler(
-    input idex_mem_read, idex_mem_write,
+    input idex_mem_read,
     input [4:0] d_rs1, d_rs2, idex_rd, d_rd,
     output logic pc_write, if_id_write, id_ex_write
 );
     always_comb begin
-        if ((idex_mem_read) && idex_rd != 0 && (idex_rd == d_rs1 || idex_rd == d_rd)) begin
+        if (idex_mem_read && idex_rd != 0 && (idex_rd == d_rs1 || idex_rd == d_rs2 || idex_rd == d_rd)) begin
             pc_write = 0;
             if_id_write = 0;
             id_ex_write = 0;

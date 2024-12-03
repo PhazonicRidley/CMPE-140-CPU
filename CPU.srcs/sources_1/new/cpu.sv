@@ -120,7 +120,7 @@ logic d_branch, d_mem_read, d_mem_write,
 logic [3:0] d_alu_op;
 
 // Handle stalls
-stall_handler sh(id_ex_mem_read, id_ex_mem_write,
+stall_handler sh(id_ex_mem_read,
     d_rs1, d_rs2, id_ex_rd, d_rd, 
     pc_wen, if_id_wen, id_ex_wen);
 
@@ -205,17 +205,6 @@ alu a(x_alu_first_src, x_alu_second_src,
       x_alu_op,
       x_alu_result);
 
-
-always_comb begin
-    if (id_ex_mem_write) begin
-        case (forward_b)
-            2: x_reg_read_data_two = ex_mem_alu_result;
-            1: x_reg_read_data_two = wb_reg_write_data;
-            default: x_reg_read_data_two = id_ex_reg_read_data_two;
-        endcase
-    end
-end
-//assign x_reg_read_data_two = (id_ex_mem_write && forward_b == 2) ? ex_mem_alu_result : id_ex_reg_read_data_two;
 always @ (posedge clk) begin
     // Control Propagation
     ex_mem_branch <= id_ex_branch;
@@ -226,7 +215,7 @@ always @ (posedge clk) begin
 
     // Data Propagation
     ex_mem_alu_result <= x_alu_result;
-    ex_mem_reg_read_data_two <= x_reg_read_data_two;
+    ex_mem_reg_read_data_two <= x_reg_src;
     ex_mem_rd <= id_ex_rd;
     ex_mem_buf_size <= id_ex_alu_op;
 end

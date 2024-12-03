@@ -65,6 +65,6 @@ module mem_access(
  end
  
  assign read_data = (mem_read) ? mem_data_out : 'x;
- assign dmem_data = (dmem_wen) ? mem_data_out : 'z;
+ assign dmem_data = (mem_write) ? mem_data_out : 'z;
 
 endmodule
