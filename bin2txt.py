@@ -16,7 +16,7 @@ except FileNotFoundError:
     exit(1)
 
 if not file_bytes:
-    print("file_bytes not populated")
+    print("Binary is empty, nothing to convert")
     exit(1)
 
 txt_file = ""
